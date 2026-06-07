@@ -50,7 +50,7 @@ Since this extension is in development, you can load it into Google Chrome as an
 
 1.  **Clone or Download this Repository**:
     ```bash
-    git clone https://github.com/your-username/x-scraper.git
+    git clone https://github.com/cursorkz-cmd/x-scraper.git
     ```
 2.  **Open Chrome Extensions Page**:
     *   In Google Chrome, navigate to `chrome://extensions/`.
