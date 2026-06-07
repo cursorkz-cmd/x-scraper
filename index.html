@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Post Scraper Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --surface-color: rgba(23, 32, 53, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-blue: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --code-bg: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.03) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .credential-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 6px 16px;
+            border-radius: 100px;
+            color: #60a5fa;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .credential-badge:hover {
+            background: rgba(59, 130, 246, 0.18);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .credential-badge::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-blue);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fff 0%, #9ca3af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        section {
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 24px;
+            background: var(--accent-blue);
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #e5e7eb;
+            margin: 25px 0 12px 0;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 14px;
+            color: var(--text-secondary);
+        }
+
+        li::before {
+            content: "→";
+            position: absolute;
+            left: 5px;
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        li strong {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* Status colors within lists */
+        .status-safe { color: var(--accent-green); font-weight: 500; }
+        .status-balanced { color: var(--accent-blue); font-weight: 500; }
+        .status-fast { color: var(--accent-yellow); font-weight: 500; }
+        
+        .indicator-green { color: var(--accent-green); font-weight: 500; }
+        .indicator-yellow { color: var(--accent-yellow); font-weight: 500; }
+        .indicator-red { color: var(--accent-red); font-weight: 500; }
+
+        ol {
+            list-style: none;
+            counter-reset: steps;
+            margin-bottom: 25px;
+        }
+
+        ol li {
+            counter-increment: steps;
+            padding-left: 35px;
+        }
+
+        ol li::before {
+            content: counter(steps);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 15px 0 25px 0;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #e5e7eb;
+        }
+
+        p code, li code {
+            background-color: rgba(255, 255, 255, 0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .tree-structure {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            background-color: var(--code-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: rgba(156, 163, 175, 0.4);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: rgba(156, 163, 175, 0.6);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: var(--accent-blue);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 20px 10px; }
+            section { padding: 20px; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <a href="https://cursor.kz" target="_blank" class="credential-badge">cursor.kz</a>
+            <h1>X-Post Scraper: Export Posts, Users & Trends</h1>
+            <p class="subtitle">A premium, modern, and feature-rich Chrome Extension (Manifest V3) designed to scrape posts, profiles, engagement metrics, and trends from X (Twitter).</p>
+        </header>
+
+        <section id="features">
+            <h2>🌟 Features</h2>
+
+            <h3>1. Live Extension Popup Scraper Panel</h3>
+            <ul>
+                <li><strong>Custom Scrape Limits</strong>: Set targets from 50, 100, 250, 500 tweets, or run indefinitely.</li>
+                <li><strong>Scroll Delay Controls</strong>: Adjustable scraping intervals (<code class="status-safe">Safe Mode</code> (3s), <code class="status-balanced">Balanced</code> (2s), or <code class="status-fast">Fast Mode</code> (1s)) to align with rate-limits and usage.</li>
+                <li><strong>Connection Status</strong>: Visual <span class="indicator-green">green</span>/<span class="indicator-yellow">yellow</span>/<span class="indicator-red">red</span> indicators verifying active connection status to X.com.</li>
+                <li><strong>Real-time Progress Tracker</strong>: Pulse animations showing live tweet count and scraping progress.</li>
+            </ul>
+
+            <h3>2. Analytics & Trends Dashboard</h3>
+            <ul>
+                <li><strong>KPI Metrics</strong>: Overview of total tweets scraped, active authors, average engagement rates, and a custom Word Density Index.</li>
+                <li><strong>Hashtag Analysis</strong>: Dynamically generated SVG-based visual bar charts illustrating the frequency of extracted hashtags.</li>
+                <li><strong>Author Volume Charts</strong>: Distribution charts highlighting the most active authors from the scraped dataset.</li>
+            </ul>
+
+            <h3>3. Scraped Author Hub</h3>
+            <ul>
+                <li>An interactive profile catalog displaying metadata cards for detected profiles, listing bios, handle tags, follower info, and display tags.</li>
+            </ul>
+
+            <h3>4. Tweet Ledger (Data Table)</h3>
+            <ul>
+                <li><strong>Search</strong>: Instant text-based filter across content, handles, and hashtags.</li>
+                <li><strong>Granular Filters</strong>: Filter by specific author handle or engagement milestones (e.g., &gt;50, &gt;250, or &gt;1,000 likes).</li>
+                <li><strong>Sort options</strong>: Sort by date, replies, retweets, likes, or views.</li>
+                <li><strong>Bulk Actions & Page Controls</strong>: Select all or specific tweets to export, and paginate through large datasets.</li>
+            </ul>
+
+            <h3>5. Export Formats</h3>
+            <ul>
+                <li><strong>JSON</strong>: Full database schema backup.</li>
+                <li><strong>CSV</strong>: Ready for spreadsheet analysis (Excel, Google Sheets).</li>
+                <li><strong>Markdown</strong>: Beautifully formatted tables and quotes for notes/docs.</li>
+                <li><strong>Standalone HTML</strong>: Self-contained, styled dashboard displaying the exported tweets.</li>
+            </ul>
+        </section>
+
+        <section id="tech-stack">
+            <h2>🛠️ Tech Stack & Architecture</h2>
+            <ul>
+                <li><strong>Manifest Version</strong>: 3 (latest Chrome extension standard)</li>
+                <li><strong>UI/UX</strong>: Custom CSS featuring glassmorphism, glowing micro-animations, and modern typography (Outfit Google Font)</li>
+                <li><strong>State Management</strong>: Chrome Storage API (<code>chrome.storage.local</code>) for fast, persistent client-side data</li>
+                <li><strong>Background Worker</strong>: Service worker orchestration (<code>background.js</code>) handling tab communication</li>
+                <li><strong>Content Injection</strong>: Content scripts (<code>content.js</code>) that scan post feeds and extract data elements safely</li>
+            </ul>
+        </section>
+
+        <section id="installation">
+            <h2>🚀 Installation & Getting Started</h2>
+            <p>Since this extension is in development, you can load it into Google Chrome as an <strong>unpacked extension</strong>:</p>
+            
+            <ol>
+                <li>
+                    <strong>Clone or Download this Repository</strong>:
+                    <pre><code>git clone https://github.com/cursorkz-cmd/x-scraper.git</code></pre>
+                </li>
+                <li>
+                    <strong>Open Chrome Extensions Page</strong>:
+                    <ul>
+                        <li>In Google Chrome, navigate to <code>chrome://extensions/</code>.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Enable Developer Mode</strong>:
+                    <ul>
+                        <li>Toggle the <strong>Developer mode</strong> switch in the top-right corner.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Load Unpacked Extension</strong>:
+                    <ul>
+                        <li>Click the <strong>Load unpacked</strong> button in the top-left.</li>
+                        <li>Select the root folder of this project (containing <code>manifest.json</code>).</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Pin the Extension</strong>:
+                    <ul>
+                        <li>Click the puzzle piece icon in your Chrome toolbar and pin <strong>X-Post Scraper</strong>.</li>
+                    </ul>
+                </li>
+            </ol>
+        </section>
+
+        <section id="how-to-use">
+            <h2>📖 How to Use</h2>
+            <ol>
+                <li><strong>Navigate to X (Twitter)</strong>: Open <a href="https://x.com" target="_blank" style="color: var(--accent-blue);">x.com</a> or <a href="https://twitter.com" target="_blank" style="color: var(--accent-blue);">twitter.com</a> and log in.</li>
+                <li><strong>Configure Scraper</strong>: Click the extension icon. If you are on an active X tab, the configuration panel will unlock.</li>
+                <li><strong>Start Scraping</strong>: Select your limits and interval, and click <strong>Start Scraping</strong>. Scroll down the feed or search page to allow tweets to load. The extension will gather data automatically.</li>
+                <li><strong>View Analytics</strong>: Click <strong>Open Analytics Dashboard</strong> at the bottom of the popup to open the full dashboard in a new tab.</li>
+                <li><strong>Export Data</strong>: In the dashboard, click <strong>Export Ledger</strong> and select your preferred output format.</li>
+            </ol>
+        </section>
+
+        <section id="structure">
+            <h2>📂 Project Structure</h2>
+            <div class="tree-structure">
+├── assets/                  # Extension icons<br>
+├── utils/<br>
+│   └── export.js            # Export utility logic (CSV, JSON, Markdown, HTML)<br>
+├── background.js            # Background service worker<br>
+├── content.js               # Content script injected into X pages<br>
+├── dashboard.css            # Styles for the analytics dashboard<br>
+├── dashboard.html           # Analytics and Tweet ledger HTML<br>
+├── dashboard.js             # Dashboard client logic and SVG charting<br>
+├── manifest.json            # Extension configuration manifest<br>
+├── popup.css                # Styles for the extension popup<br>
+├── popup.html               # Main extension popup HTML<br>
+├── popup.js                 # Popup logic and controls<br>
+├── LICENSE                  # License file<br>
+└── README.md                # Documentation
+            </div>
+        </section>
+
+        <section id="license">
+            <h2>🛡️ License</h2>
+            <p>This project is licensed under the MIT License. See the LICENSE file for details.</p>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Developed <a href="https://cursor.kz" target="_blank">cursor.kz</a>. Distributed under the MIT License.</p>
+        </footer>
+    </div>
+
+</body>
+</html>
