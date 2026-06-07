@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X-Post Scraper</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="logo-area">
+        <div class="glow-dot"></div>
+        <span class="logo-text">X-POST SCRAPER</span>
+      </div>
+      <span class="version-tag">v1.0.0</span>
+    </header>
+
+    <!-- Tab status / Warnings -->
+    <div id="status-card" class="glass-card status-card">
+      <div class="status-indicator">
+        <span id="status-dot" class="indicator-dot idle"></span>
+        <span id="status-text" class="status-msg">Analyzing connection...</span>
+      </div>
+      <div id="profile-badge" class="profile-badge hidden">
+        <svg viewBox="0 0 24 24" class="icon-user"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span id="detected-profile">@username</span>
+      </div>
+    </div>
+
+    <!-- Active Scraper panel (When active on X) -->
+    <div id="active-panel" class="panel hidden">
+      <div class="glass-card config-card">
+        <h3>Configuration</h3>
+        
+        <!-- Scrape Limit -->
+        <div class="field">
+          <div class="field-info">
+            <label for="limit-select">Scrape Limit</label>
+            <span class="value-badge" id="limit-val">100</span>
+          </div>
+          <select id="limit-select" class="custom-select">
+            <option value="50">50 Tweets</option>
+            <option value="100" selected>100 Tweets</option>
+            <option value="250">250 Tweets</option>
+            <option value="500">500 Tweets</option>
+            <option value="0">Unlimited</option>
+          </select>
+        </div>
+
+        <!-- Scroll Delay / Speed -->
+        <div class="field">
+          <div class="field-info">
+            <label for="speed-select">Scroll Delay (Interval)</label>
+            <span class="value-badge" id="speed-val">2s</span>
+          </div>
+          <select id="speed-select" class="custom-select">
+            <option value="3000">Safe Mode (3s)</option>
+            <option value="2000" selected>Balanced (2s)</option>
+            <option value="1000">Fast Mode (1s)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Scraper Live Session Stats -->
+      <div class="glass-card stats-card hidden" id="live-stats">
+        <div class="stat-row">
+          <span class="stat-lbl">Posts Scraped</span>
+          <span class="stat-num pulse-text" id="live-count">0</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar-glow" id="progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- Scrape Controls Buttons -->
+      <div class="btn-group">
+        <button id="btn-start" class="btn btn-primary btn-glow">
+          <svg viewBox="0 0 24 24" class="btn-icon"><path d="M8 5v14l11-7z"/></svg>
+          Start Scraping
+        </button>
+        <button id="btn-stop" class="btn btn-secondary hidden" disabled>
+          <svg viewBox="0 0 24 24" class="btn-icon"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          Stop Scraping
+        </button>
+      </div>
+    </div>
+
+    <!-- Error/Fallback Panel (When not on X) -->
+    <div id="fallback-panel" class="panel hidden">
+      <div class="glass-card fallback-card">
+        <svg viewBox="0 0 24 24" class="fallback-icon"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <p class="fallback-msg">This extension requires an active X/Twitter tab to perform data scraping operations.</p>
+        <button id="btn-open-x" class="btn btn-primary btn-glow">
+          Navigate to X.com
+        </button>
+      </div>
+    </div>
+
+    <!-- Dashboard Link Section -->
+    <footer class="popup-footer">
+      <button id="btn-dashboard" class="btn btn-dashboard">
+        <svg viewBox="0 0 24 24" class="btn-icon"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        Open Analytics Dashboard
+      </button>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

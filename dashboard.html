@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X-Post Scraper Control Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <!-- Dashboard Grid Wrapper -->
+  <div class="dashboard-wrapper">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo-glow"></div>
+        <h2>X-SCRAPER</h2>
+      </div>
+      <nav class="nav-links">
+        <button class="nav-btn active" data-tab="tab-analytics">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+          Analytics & Trends
+        </button>
+        <button class="nav-btn" data-tab="tab-authors">
+          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          Scraped Author Hub
+        </button>
+        <button class="nav-btn" data-tab="tab-ledger">
+          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          Tweet Ledger
+        </button>
+      </nav>
+
+      <!-- System status inside sidebar -->
+      <div class="sidebar-status glass-card">
+        <div class="status-indicator">
+          <span class="status-dot" id="system-status-dot"></span>
+          <span class="status-label" id="system-status-label">Monitoring X tab</span>
+        </div>
+        <p class="status-desc" id="system-status-desc">All scraping operations are currently idle.</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="main-content">
+      
+      <!-- Top header bar -->
+      <header class="main-header">
+        <div class="header-info">
+          <h1 id="tab-title">Analytics & Trends</h1>
+          <p class="text-muted" id="tab-subtitle">Real-time engagement analysis, author profiles, and hashtag counts</p>
+        </div>
+        
+        <!-- Quick Export Buttons -->
+        <div class="header-actions">
+          <div class="export-dropdown-container">
+            <button class="btn btn-primary" id="btn-export-options">
+              <svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
+              Export Ledger
+            </button>
+            <div class="export-menu hidden" id="export-menu">
+              <button class="export-item" id="export-json">Export as JSON (.json)</button>
+              <button class="export-item" id="export-csv">Export as CSV (.csv)</button>
+              <button class="export-item" id="export-md">Export as Markdown (.md)</button>
+              <button class="export-item" id="export-html">Export Standalone HTML (.html)</button>
+            </div>
+          </div>
+          <button class="btn btn-secondary" id="btn-clear-db">Clear Database</button>
+        </div>
+      </header>
+
+      <!-- Content Tabs -->
+      <div class="content-body">
+        
+        <!-- Tab 1: Analytics & Trends -->
+        <section id="tab-analytics" class="tab-pane active">
+          <!-- KPI Metrics Row -->
+          <div class="kpi-grid">
+            <div class="kpi-card glass-card">
+              <div class="kpi-icon-wrapper blue">
+                <svg viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.7 0-1.37-.2-1.95-.53v.05c0 2.08 1.48 3.82 3.44 4.21-.36.1-.74.15-1.13.15-.27 0-.54-.03-.8-.08.54 1.69 2.11 2.92 3.97 2.95-1.46 1.14-3.3 1.82-5.3 1.82-.35 0-.69-.02-1.03-.06C2.82 20.31 5.09 21 7.5 21c9 0 13.92-7.46 13.92-13.92 0-.21 0-.42-.02-.62.95-.69 1.78-1.56 2.44-2.54z"/></svg>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-lbl">Tweets Scraped</span>
+                <h3 class="kpi-val" id="kpi-tweets">0</h3>
+              </div>
+            </div>
+            <div class="kpi-card glass-card">
+              <div class="kpi-icon-wrapper cyan">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-lbl">Active Authors</span>
+                <h3 class="kpi-val" id="kpi-authors">0</h3>
+              </div>
+            </div>
+            <div class="kpi-card glass-card">
+              <div class="kpi-icon-wrapper purple">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-lbl">Avg. Engagement Rate</span>
+                <h3 class="kpi-val" id="kpi-likes">0</h3>
+              </div>
+            </div>
+            <div class="kpi-card glass-card">
+              <div class="kpi-icon-wrapper orange">
+                <svg viewBox="0 0 24 24"><path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/></svg>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-lbl">Word Density Index</span>
+                <h3 class="kpi-val" id="kpi-hashtags">0</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Charts Grid -->
+          <div class="charts-grid">
+            <!-- Hashtag Trend Custom Chart -->
+            <div class="chart-card glass-card">
+              <div class="chart-header">
+                <h3>Top Hashtags Extracted</h3>
+                <span class="badge">Hashtag Frequency</span>
+              </div>
+              <div class="chart-content" id="hashtag-chart-container">
+                <!-- Programmatically generated custom SVG/CSS bar chart -->
+                <div class="loading-state">Scrape X data to populate trends</div>
+              </div>
+            </div>
+
+            <!-- Most Active Scraped Authors Custom Chart -->
+            <div class="chart-card glass-card">
+              <div class="chart-header">
+                <h3>Top Scraped Authors (Post Counts)</h3>
+                <span class="badge">Author Volume</span>
+              </div>
+              <div class="chart-content" id="author-chart-container">
+                <!-- Programmatically generated custom SVG/CSS horizontal chart -->
+                <div class="loading-state">Scrape profiles to show distribution</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: Scraped Author Hub -->
+        <section id="tab-authors" class="tab-pane">
+          <div class="hub-header">
+            <h3>Scraped Profiles Index</h3>
+            <p class="text-muted">Interactive metadata cards for detected user profile layouts</p>
+          </div>
+          <!-- Profiles grid container -->
+          <div class="profiles-grid" id="profiles-grid-container">
+            <!-- Dynamic profile cards loaded here -->
+            <div class="empty-state">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+              <h4>No scraped profiles available</h4>
+              <p>Navigate to an X profile, start scraping to extract author biographies, follows, and display tags.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 3: Tweet Ledger (Data Table) -->
+        <section id="tab-ledger" class="tab-pane">
+          <!-- Filter toolbar -->
+          <div class="filter-toolbar glass-card">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" class="search-icon"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <input type="text" id="ledger-search" placeholder="Search posts, handles, keywords, hashtags...">
+            </div>
+            
+            <div class="filter-controls">
+              <!-- Author Filter -->
+              <select id="filter-author" class="filter-select">
+                <option value="ALL">All Authors</option>
+              </select>
+
+              <!-- Engagement Filter -->
+              <select id="filter-engagement" class="filter-select">
+                <option value="0">All Engagements</option>
+                <option value="50">> 50 Likes</option>
+                <option value="250">> 250 Likes</option>
+                <option value="1000">> 1,000 Likes</option>
+              </select>
+
+              <!-- Sort Option -->
+              <select id="ledger-sort" class="filter-select">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="likes">Likes (High to Low)</option>
+                <option value="retweets">Retweets (High to Low)</option>
+                <option value="views">Views (High to Low)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="table-container glass-card">
+            <table class="data-table" id="tweets-table">
+              <thead>
+                <tr>
+                  <th width="40"><input type="checkbox" id="select-all-checkbox"></th>
+                  <th>Author</th>
+                  <th width="40%">Tweet Content</th>
+                  <th class="sortable text-center" data-sort="replies">Replies</th>
+                  <th class="sortable text-center" data-sort="retweets">Retweets</th>
+                  <th class="sortable text-center" data-sort="likes">Likes</th>
+                  <th class="sortable text-center" data-sort="views">Views</th>
+                  <th class="sortable" data-sort="date">Date</th>
+                  <th width="100">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tweets-tbody">
+                <!-- Dynamically loaded rows -->
+              </tbody>
+            </table>
+            
+            <!-- Table Empty State -->
+            <div id="table-empty" class="table-empty hidden">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <h4>No tweets match filter criteria</h4>
+              <p>Try resetting the search terms or adjustments.</p>
+            </div>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="pagination-bar">
+            <span class="pagination-info" id="pagination-info">Showing 0 to 0 of 0 entries</span>
+            <div class="pagination-controls">
+              <button class="btn btn-mini" id="btn-page-prev">Prev</button>
+              <div class="page-numbers" id="page-numbers-container">
+                <!-- Page numbers generated -->
+              </div>
+              <button class="btn btn-mini" id="btn-page-next">Next</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Clear Confirmation Modal -->
+  <div class="modal-overlay hidden" id="modal-clear-confirm">
+    <div class="modal-card glass-card">
+      <h3>Wipe Scraper Databases?</h3>
+      <p>This action will permanently delete all scraped posts and saved author profiles from the extension's database. This cannot be undone.</p>
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" id="modal-confirm-yes">Yes, Wipe Data</button>
+        <button class="btn btn-dashboard" id="modal-confirm-no">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Scripts -->
+  <script src="utils/export.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
