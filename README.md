@@ -95,6 +95,32 @@ Since this extension is in development, you can load it into Google Chrome as an
 
 ---
 
+## 📋 Changelog
+
+### v1.1.0 — 2026-06-12
+
+#### 🐛 Bug Fixes
+
+**Scraper Resilience**
+- **Background tab interruption** — Scraping no longer pauses when the user switches to another browser tab or window. Added `document.visibilitychange` detection: the scraper now detects when the page is hidden and resumes its scroll-and-collect loop upon returning, instead of silently halting.
+- **100-tweet hard cap** — Fixed an incorrect count ceiling that stopped scraping at exactly 100–111 tweets regardless of the user-set limit. The root cause was comparing the total database size against the current-session limit. Replaced with a `sessionTweetIds` `Set` that tracks only tweets collected in the current session, so unlimited scraping works correctly across all limit presets.
+- **"Show more" text truncation** — Tweets with collapsed long-form text were being stored with the literal string `"Show more"` appended at the end. The scraper now targets X's stable `[data-testid="tweet-text-show-more-link"]` element to detect and purge truncation remnants before saving the full text to storage.
+- **Premature "bottom reached" detection** — Added an `isPageLoading` guard that checks for active spinner elements before concluding there are no more tweets to load, preventing false stops during slow network conditions.
+
+**Dashboard — Content Security Policy (CSP)**
+- **Inline `onclick` handlers blocked** — Chrome's Manifest V3 CSP rejects `onclick="..."` attributes in dynamically generated HTML. All four violation sites were eliminated:
+  - SVG hashtag chart bars: replaced `onclick="window.filterLedgerByHashtag(...)"` with `data-hashtag` attributes and post-render `querySelectorAll` event listeners.
+  - SVG author chart bars: replaced `onclick="window.filterLedgerByAuthor(...)"` with `data-handle` attributes and post-render `querySelectorAll` event listeners.
+  - Author Hub profile cards: replaced `onclick` on the *View Scraped Posts* button with a `data-handle` attribute and a direct `addEventListener` call after DOM insertion.
+  - Tweet Ledger text cells (`#hashtag` / `@mention` links): replaced inline `onclick` in regex-generated anchor tags with `data-hashtag` / `data-author` attributes and a single **delegated listener** on the `<tbody>` element that handles all current and future dynamically rendered rows.
+  - Removed all `window.filterLedger*` global function exposures; replaced with local scoped functions.
+
+#### ⚙️ Internal Improvements
+- Added `unlimitedStorage` permission to `manifest.json` to support large scraping sessions without hitting Chrome's default storage quota.
+- Added `chrome.runtime.lastError` guards to all `sendMessage` calls in `popup.js` to silence uncaught extension context errors on tab close.
+
+---
+
 ## 🛡️ License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

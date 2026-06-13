@@ -7,6 +7,7 @@ let maxLimit = 100;
 let scrollDelay = 2000;
 let lastScrollHeight = 0;
 let sameHeightCount = 0;
+let sessionTweetIds = new Set();
 
 // Set up message listener from popup or background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -19,12 +20,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     maxLimit = (typeof message.limit === "number") ? message.limit : 100;
     scrollDelay = message.delay || 2000;
     scrapedCount = 0;
+    sessionTweetIds.clear();
     
     // Notify background script we started
     chrome.runtime.sendMessage({ 
       action: "SCRAPE_STARTED", 
       url: window.location.href,
       profile: detectProfile()
+    }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.warn("SCRAPE_STARTED response error:", chrome.runtime.lastError.message);
+      }
     });
 
     startScrollAndScrape();
@@ -379,6 +385,16 @@ function scrapeVisibleTweets() {
   return tweets;
 }
 
+// Helper: Check if page is currently loading new content
+function isPageLoading() {
+  return !!(
+    document.querySelector('[role="progressbar"]') ||
+    document.querySelector('[data-testid="spinner"]') ||
+    document.querySelector('svg[class*="spinner"]') ||
+    document.querySelector('.loading-spinner')
+  );
+}
+
 // Scrolling and Scraping controller loop
 function startScrollAndScrape() {
   lastScrollHeight = document.documentElement.scrollHeight;
@@ -390,6 +406,10 @@ function startScrollAndScrape() {
     chrome.runtime.sendMessage({
       action: "PROFILE_SCRAPED",
       profile: profileMetadata
+    }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.warn("PROFILE_SCRAPED response error:", chrome.runtime.lastError.message);
+      }
     });
   }
 
@@ -402,21 +422,26 @@ function startScrollAndScrape() {
     
     // 1. Scrape current screen
     const newTweets = scrapeVisibleTweets();
+    newTweets.forEach(t => {
+      if (t.id) sessionTweetIds.add(t.id);
+    });
+    scrapedCount = sessionTweetIds.size;
     
     // 2. Send to background to save & get current count
     chrome.runtime.sendMessage({
       action: "TWEETS_SCRAPED",
       tweets: newTweets,
-      profile: detectProfile()
+      profile: detectProfile(),
+      sessionCount: scrapedCount
     }, (response) => {
-      if (response && response.count !== undefined) {
-        scrapedCount = response.count;
-        
-        // Check if we hit limit
-        if (maxLimit !== 0 && scrapedCount >= maxLimit) {
-          stopScraping("LIMIT_REACHED");
-          return;
-        }
+      if (chrome.runtime.lastError) {
+        console.warn("TWEETS_SCRAPED response error:", chrome.runtime.lastError.message);
+        return;
+      }
+      
+      // Check if we hit limit
+      if (maxLimit !== 0 && scrapedCount >= maxLimit) {
+        stopScraping("LIMIT_REACHED");
       }
     });
     
@@ -425,11 +450,21 @@ function startScrollAndScrape() {
     
     // 4. Check if we've reached the bottom
     setTimeout(() => {
+      if (document.hidden) {
+        // Skip check if tab is hidden
+        return;
+      }
       const currentScrollHeight = document.documentElement.scrollHeight;
       if (currentScrollHeight === lastScrollHeight) {
+        // If there's a loading spinner/progressbar, the page is trying to load content.
+        // We should wait and not count this as "bottom reached".
+        if (isPageLoading()) {
+          sameHeightCount = 0;
+          return;
+        }
+        
         sameHeightCount++;
-        if (sameHeightCount >= 5) {
-          // No more content loading, end scraping
+        if (sameHeightCount >= 15) { // 30 seconds threshold
           stopScraping("BOTTOM_REACHED");
         }
       } else {
@@ -454,6 +489,10 @@ function stopScraping(reason) {
       action: "SCRAPE_COMPLETED",
       reason: reason,
       count: scrapedCount
+    }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.warn("SCRAPE_COMPLETED response error:", chrome.runtime.lastError.message);
+      }
     });
   }
 }

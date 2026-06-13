@@ -82,7 +82,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.storage.local.set({ scraped_tweets: mergedList }, () => {
         // Update active scraper stats
         if (tabId && activeScrapers[tabId]) {
-          activeScrapers[tabId].scrapedCount = mergedList.length;
+          activeScrapers[tabId].scrapedCount = message.sessionCount || 0;
         }
         
         broadcastToPopup({ 

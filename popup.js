@@ -92,6 +92,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // Retry query status after injection
       setTimeout(() => {
         chrome.tabs.sendMessage(activeTabId, { action: "GET_STATUS" }, (response) => {
+          if (chrome.runtime.lastError) {
+            updateStatus("error", "Failed to link. Reload tab.");
+            return;
+          }
           if (response) {
             handleStatusResponse(response);
           } else {
@@ -177,6 +181,10 @@ document.addEventListener("DOMContentLoaded", () => {
       limit: limit, 
       delay: delay 
     }, (response) => {
+      if (chrome.runtime.lastError) {
+        updateStatus("error", "Failed to start: tab disconnected");
+        return;
+      }
       if (response && response.status === "STARTED") {
         setScrapingUI(true);
         updateLiveStats(0);
@@ -191,6 +199,10 @@ document.addEventListener("DOMContentLoaded", () => {
     updateStatus("idle", "Halting operations...");
     
     chrome.tabs.sendMessage(activeTabId, { action: "STOP_SCRAPING" }, (response) => {
+      if (chrome.runtime.lastError) {
+        updateStatus("error", "Failed to stop: tab disconnected");
+        return;
+      }
       if (response && response.status === "STOPPED") {
         setScrapingUI(false);
         updateStatus("idle", `Scraping halted. Scraped ${response.count}`);
@@ -211,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (message.action === "TWEETS_SAVED") {
       // Dynamic count-up feedback
       chrome.tabs.sendMessage(activeTabId, { action: "GET_STATUS" }, (response) => {
+        if (chrome.runtime.lastError) return;
         if (response && response.isScraping) {
           updateLiveStats(response.count);
         }

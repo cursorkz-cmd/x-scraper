@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const y = 230 - barHeight;
       
       svgHtml += `
-        <g class="chart-bar-group" onclick="window.filterLedgerByHashtag('${item[0]}')">
+        <g class="chart-bar-group" data-hashtag="${item[0]}">
           <!-- Main Bar -->
           <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="6" fill="url(#neon-cyan-grad)" />
           
@@ -257,6 +257,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     svgHtml += `</svg>`;
     hashtagChartContainer.innerHTML = svgHtml;
+    // Attach click listeners after DOM injection (avoids CSP inline-handler violation)
+    hashtagChartContainer.querySelectorAll(".chart-bar-group").forEach(g => {
+      g.addEventListener("click", () => filterLedgerByHashtag(g.dataset.hashtag));
+    });
   }
 
   // Draw horizontal SVG Active Authors distribution chart
@@ -309,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const x = 85;
       
       svgHtml += `
-        <g class="chart-bar-group" onclick="window.filterLedgerByAuthor('${handle}')">
+        <g class="chart-bar-group" data-handle="${handle}">
           <!-- Horizontal Bar -->
           <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="4" fill="url(#purple-pink-grad)" />
           
@@ -326,24 +330,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     svgHtml += `</svg>`;
     authorChartContainer.innerHTML = svgHtml;
+    // Attach click listeners after DOM injection (avoids CSP inline-handler violation)
+    authorChartContainer.querySelectorAll(".chart-bar-group").forEach(g => {
+      g.addEventListener("click", () => filterLedgerByAuthor(g.dataset.handle));
+    });
   }
 
-  // Expose global callback hooks for chart click events
-  window.filterLedgerByHashtag = (hashtag) => {
-    // Navigate to ledger tab
+  // Filter navigation helpers — local functions, called only via event listeners (no inline onclick)
+  function filterLedgerByHashtag(hashtag) {
     document.querySelector('[data-tab="tab-ledger"]').click();
-    
-    // Set query
     ledgerSearch.value = `#${hashtag}`;
     applyLedgerFilters();
-  };
+  }
 
-  window.filterLedgerByAuthor = (handle) => {
+  function filterLedgerByAuthor(handle) {
     document.querySelector('[data-tab="tab-ledger"]').click();
-    
     filterAuthor.value = handle;
     applyLedgerFilters();
-  };
+  }
 
   // ----------------------------------------------------
   // 4. Tab 2: Scraped Author Hub (User Profiles Grid)
@@ -398,10 +402,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="profile-card-stat-lbl">Tweets Scraped</span>
           </div>
         </div>
-        <button class="btn btn-dashboard" style="margin-top: auto; font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="window.filterLedgerByAuthor('${p.handle}')">
+        <button class="btn btn-dashboard profile-ledger-btn" style="margin-top: auto; font-size: 0.8rem; padding: 0.5rem 1rem;" data-handle="${p.handle}">
           View Scraped Posts
         </button>
       `;
+      // Bind listener after card is built so filterLedgerByAuthor is reachable
+      card.querySelector(".profile-ledger-btn").addEventListener("click", () => filterLedgerByAuthor(p.handle));
       profilesGridContainer.appendChild(card);
     });
   }
@@ -529,10 +535,10 @@ document.addEventListener("DOMContentLoaded", () => {
         mediaPreviewHtml += `</div>`;
       }
 
-      // Highlight hashtags/mentions
+      // Highlight hashtags/mentions — use data attributes; clicks handled by delegated listener on tweetsTbody
       let formattedText = t.text;
-      formattedText = formattedText.replace(/#(\w+)/g, '<a href="#" onclick="window.filterLedgerByHashtag(\'$1\'); return false;">#$1</a>');
-      formattedText = formattedText.replace(/@(\w+)/g, '<a href="#" onclick="window.filterLedgerByAuthor(\'@$1\'); return false;">@$1</a>');
+      formattedText = formattedText.replace(/#(\w+)/g, '<a href="#" class="hashtag-link" data-hashtag="$1">#$1</a>');
+      formattedText = formattedText.replace(/@(\w+)/g, '<a href="#" class="author-link" data-author="@$1">@$1</a>');
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -640,6 +646,19 @@ document.addEventListener("DOMContentLoaded", () => {
   filterAuthor.addEventListener("change", applyLedgerFilters);
   filterEngagement.addEventListener("change", applyLedgerFilters);
   ledgerSort.addEventListener("change", applyLedgerFilters);
+
+  // Delegated listener for hashtag/mention links rendered inside tweet text cells
+  tweetsTbody.addEventListener("click", (e) => {
+    const hashLink = e.target.closest(".hashtag-link");
+    const authorLink = e.target.closest(".author-link");
+    if (hashLink) {
+      e.preventDefault();
+      filterLedgerByHashtag(hashLink.dataset.hashtag);
+    } else if (authorLink) {
+      e.preventDefault();
+      filterLedgerByAuthor(authorLink.dataset.author);
+    }
+  });
 
   // Pagination buttons
   btnPagePrev.addEventListener("click", () => {
